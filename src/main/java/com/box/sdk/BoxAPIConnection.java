@@ -41,6 +41,7 @@ public class BoxAPIConnection {
     private volatile long lastRefresh;
     private volatile long expires;
 
+	private String asUser;
     private String userAgent;
     private String accessToken;
     private String refreshToken;
@@ -137,7 +138,12 @@ public class BoxAPIConnection {
         BoxAPIRequest request = new BoxAPIRequest(url, "POST");
         request.addHeader("Content-Type", "application/x-www-form-urlencoded");
         request.addHeader("User-Agent", this.getUserAgent());
-        request.setBody(urlParameters);
+		
+		if(this.getAsUser() != null || !this.getAsUser().equals("")){
+			request.addHeader("As-User", this.getAsUser());
+		} 
+        
+		request.setBody(urlParameters);
 
         BoxJSONResponse response = (BoxJSONResponse) request.send();
         String json = response.getJSON();
@@ -224,7 +230,7 @@ public class BoxAPIConnection {
     public String getUserAgent() {
         return this.userAgent;
     }
-
+	
     /**
      * Sets the user agent to be used when sending requests to the Box API.
      * @param userAgent the user agent.
@@ -233,6 +239,20 @@ public class BoxAPIConnection {
         this.userAgent = userAgent;
     }
 
+	/**
+	 * Gets the userid to be used to impersonate a particular user when sending requests to the Box API
+	 */
+	public String getAsUser() {
+		return this.asUser;
+	}
+
+	/**
+	 * Sets the userid to be used to impersonate users when sending requets to the Box API
+	 * @param asUser the userid 
+	 */
+	public void setAsUser(String asUser){
+		this.asUser = asUser;
+	}
     /**
      * Gets an access token that can be used to authenticate an API request. This method will automatically refresh the
      * access token if it has expired since the last call to <code>getAccessToken()</code>.
@@ -424,6 +444,7 @@ public class BoxAPIConnection {
         String baseUploadURL = json.get("baseUploadURL").asString();
         boolean autoRefresh = json.get("autoRefresh").asBoolean();
         int maxRequestAttempts = json.get("maxRequestAttempts").asInt();
+		String asUser = json.get("asUser").asString();
 
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
@@ -435,6 +456,7 @@ public class BoxAPIConnection {
         this.baseUploadURL = baseUploadURL;
         this.autoRefresh = autoRefresh;
         this.maxRequestAttempts = maxRequestAttempts;
+		this.asUser = asUser;
     }
 
     /**
@@ -504,7 +526,8 @@ public class BoxAPIConnection {
             .add("baseURL", this.baseURL)
             .add("baseUploadURL", this.baseUploadURL)
             .add("autoRefresh", this.autoRefresh)
-            .add("maxRequestAttempts", this.maxRequestAttempts);
+            .add("maxRequestAttempts", this.maxRequestAttempts)
+			.add("asUser", this.asUser);
         return state.toString();
     }
 }
