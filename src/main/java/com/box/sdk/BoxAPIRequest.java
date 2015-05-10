@@ -34,6 +34,7 @@ public class BoxAPIRequest {
     private static final Logger LOGGER = Logger.getLogger(BoxAPIRequest.class.getName());
     private static final int BUFFER_SIZE = 8192;
     private static final int MAX_REDIRECTS = 3;
+    private static String asUser = null;
 
     private final BoxAPIConnection api;
     private final List<RequestHeader> headers;
@@ -71,6 +72,10 @@ public class BoxAPIRequest {
 
         this.addHeader("Accept-Encoding", "gzip");
         this.addHeader("Accept-Charset", "utf-8");
+	
+        if(asUser != null){
+            this.addHeader("As-User", asUser);
+        }
     }
 
     /**
@@ -489,4 +494,14 @@ public class BoxAPIRequest {
             return this.value;
         }
     }
+
+    public static String getAsUser() {
+        return asUser;
+    }
+
+    public static void setAsUser(String asUser) {
+        BoxAPIRequest.asUser = asUser;
+    }
+    
+    
 }

@@ -41,7 +41,6 @@ public class BoxAPIConnection {
     private volatile long lastRefresh;
     private volatile long expires;
 
-    private String asUser;
     private String userAgent;
     private String accessToken;
     private String refreshToken;
@@ -138,10 +137,6 @@ public class BoxAPIConnection {
         BoxAPIRequest request = new BoxAPIRequest(url, "POST");
         request.addHeader("Content-Type", "application/x-www-form-urlencoded");
         request.addHeader("User-Agent", this.getUserAgent());
-        
-        if(this.getAsUser() != null || !this.getAsUser().equals("")){
-            request.addHeader("As-User", this.getAsUser());
-        } 
         
         request.setBody(urlParameters);
 
@@ -243,7 +238,7 @@ public class BoxAPIConnection {
      * Gets the userid to be used to impersonate a particular user when sending requests to the Box API
      */
     public String getAsUser() {
-        return this.asUser;
+        return BoxAPIRequest.getAsUser();
     }
 
     /**
@@ -251,7 +246,7 @@ public class BoxAPIConnection {
      * @param asUser the userid 
      */
     public void setAsUser(String asUser){
-        this.asUser = asUser;
+        BoxAPIRequest.setAsUser(asUser);
     }
     /**
      * Gets an access token that can be used to authenticate an API request. This method will automatically refresh the
@@ -456,7 +451,7 @@ public class BoxAPIConnection {
         this.baseUploadURL = baseUploadURL;
         this.autoRefresh = autoRefresh;
         this.maxRequestAttempts = maxRequestAttempts;
-        this.asUser = asUser;
+        BoxAPIRequest.setAsUser(asUser);
     }
 
     /**
@@ -527,7 +522,7 @@ public class BoxAPIConnection {
             .add("baseUploadURL", this.baseUploadURL)
             .add("autoRefresh", this.autoRefresh)
             .add("maxRequestAttempts", this.maxRequestAttempts)
-            .add("asUser", this.asUser);
+            .add("asUser", BoxAPIRequest.getAsUser());
         return state.toString();
     }
 }
